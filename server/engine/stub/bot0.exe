@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+import random
+import os
+import sys
+while 1:
+#    raw_input()
+#    os.system('touch 123')
+    print random.randint(0, 2)
+    sys.stdout.flush()
