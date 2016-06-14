@@ -5,14 +5,55 @@ sys.path.append('../server/engine')
 import engine
 import gc
 import subprocess
-import game
+#import game
+
+from ctypes import *
+gamelib = cdll.LoadLibrary('game.so')
+
+class Game(object):
+    def __init__(self):
+        self.obj = gamelib.CreateGame()
+    
+    def process_turn(self, p1c, p1r, p2c, p2r):
+        return gamelib.Game_process_turn(self.obj, p1c, p1r, p2c, p2r)
+
+    def get_map_str(self, mapid):
+        return gamelib.Game_get_map_str(self.obj, mapid)
+
+    def get_color(self, id, idx):
+        return gamelib.Game_get_color(self.obj, id, idx)
+
+    def get_score1(self):
+        return gamelib.Game_get_property(self.obj, 0)
+
+    def get_score2(self):
+        return gamelib.Game_get_property(self.obj, 1)
+
+    def get_gameover(self):
+        return gamelib.Game_get_property(self.obj, 2)
+
+    def get_result(self):
+        return gamelib.Game_get_property(self.obj, 3)
+
+    score1 = property(get_score1)
+    score2 = property(get_score2)
+    gameover = property(get_gameover)
+    result = property(get_result)
+
+gamelib.CreateGame.restype = c_void_p
+gamelib.DestroyGame.argtypes = [ c_void_p ]
+gamelib.Game_process_turn.argtypes = [ c_void_p, c_int, c_int, c_int, c_int ]
+gamelib.Game_get_map_str.argtypes = [ c_void_p, c_int]
+gamelib.Game_get_map_str.restype = c_char_p
+gamelib.Game_get_color.argtypes = [ c_void_p, c_int, c_int ]
+gamelib.Game_get_property.argtypes = [ c_void_p, c_int ]
 
 class SmashGame:
     def setupGame(self, players):
         assert len(players) == 2
         self.p1 = players[0]
         self.p2 = players[1]
-        self.game = game.Game()
+        self.game = Game()
 
     def playRound(self, turn):
         colors = []

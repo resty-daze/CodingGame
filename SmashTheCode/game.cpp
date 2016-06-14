@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <sstream>
 
-#include <boost/python.hpp>
+//#include <boost/python.hpp>
 
 using namespace std;
 
@@ -301,6 +301,7 @@ struct Game {
     }
 };
 
+#ifdef USE_BOOST_PYTHON
 BOOST_PYTHON_MODULE(game)
 {
     boost::python::class_<Game>("Game")
@@ -313,3 +314,38 @@ BOOST_PYTHON_MODULE(game)
         .def_readonly("result", &Game::result)
         ;
 }
+#else
+
+extern "C" {
+    Game* CreateGame() { Game* p = new Game(); return p;}
+    void DestroyGame(Game* game) { delete game; }
+
+    void Game_process_turn(Game* game, int p1_col, int p1_rot, int p2_col, int p2_rot) {
+        game->process_turn(p1_col, p1_rot, p2_col, p2_rot);
+    }
+
+    const char* Game_get_map_str(Game* game, int mapid) {
+        static std::string buf;
+        buf = game->get_map_str(mapid);
+        return buf.c_str();
+    }
+
+    int Game_get_color(Game* game, int id, int idx) {
+        return game->get_color(id, idx);
+    }
+
+    int Game_get_property(Game* game, int id) {
+        if (id == 0) {
+            return game->score1;
+        } else if (id == 1) {
+            return game->score2;
+        } else if (id == 2) {
+            return game->game_is_over;
+        } else if (id == 3) {
+            return game->result;
+        }
+
+        return 0;
+    }
+}
+#endif
