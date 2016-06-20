@@ -157,7 +157,7 @@ struct GameMap {
     }
 
     static int inboard(int x, int y) {
-        return (x > 0) && (x < 6) && (y > 0) && (y < 12);
+        return (x >= 0) && (x < 6) && (y >= 0) && (y < 12);
     }
 
     static int calcGB(int num) {
