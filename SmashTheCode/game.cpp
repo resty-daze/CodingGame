@@ -113,7 +113,7 @@ struct GameMap {
                     }
 
                     if (rem) {
-                        B += 1;
+        //                B += 1;
                         d[x][y] = '.';
                     }
                 }
